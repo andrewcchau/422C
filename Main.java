@@ -5,7 +5,7 @@
  * ac57662
  * 16460
  * Pratyush Hebera
- * <Student2 EID>
+ * pb22426
  * 16460
  * Slip days used: <0>
  * Git URL: github.com/andrewcchau/422C
