@@ -20,12 +20,12 @@ import java.io.*;
 public class Main {
 	
 	// static variables and constants only here.
-	private static ArrayList<String> words;
-	private static Set<String> dict;
-	private static ArrayList<String> link;
-	private static Set<String> visited;
-	private static Set<String> dead;
-	private static ArrayList<String> temp;
+	private static ArrayList<String> words; //holds the words from user input
+	private static Set<String> dict; //dictionary
+	private static ArrayList<String> link; //the ladder between start and end
+	private static Set<String> visited; //visited words
+	private static Set<String> dead; //dead ends
+	private static ArrayList<String> temp; //multipurpose arrList
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -105,11 +105,15 @@ public class Main {
 		return null; // replace this line later with real return
 	}
     
+    /**
+     * Creates the dictionary from a given file
+     * @return dictionary as a set of strings
+     */
 	public static Set<String>  makeDictionary () {
 		Set<String> words = new HashSet<String>();
 		Scanner infile = null;
 		try {
-			infile = new Scanner (new File("five_letter_words.txt"));
+			infile = new Scanner (new File("five_letter_words.txt")); //five_letter_words.txt original
 		} catch (FileNotFoundException e) {
 			System.out.println("Dictionary File not Found!");
 			e.printStackTrace();
@@ -118,12 +122,81 @@ public class Main {
 		while (infile.hasNext()) {
 			words.add(infile.next().toUpperCase());
 		}
+		infile.close();
 		return words;
+
 	}
 	
+	/**
+	 * Prints the ladder of words
+	 * @param ladder the ladder of words start to end
+	 */
 	public static void printLadder(ArrayList<String> ladder) {
-		
+		for(int i = 0; i < ladder.size(); i++){
+			System.out.println(ladder.get(i));
+		}
 	}
-	// TODO
-	// Other private static methods here
+
+	/**
+	 * Determines whether two given words have a 1 letter difference
+	 * @param a first word
+	 * @param b second word
+	 * @return true if letter difference is 1, otherwise false
+	 */
+	private static boolean similar(String a, String b){
+		int difference = 0;
+		for(int i = 0; i < a.length(); i++){
+			if(a.toUpperCase().charAt(i) != b.toUpperCase().charAt(i)){
+				difference++;
+			}
+			if(difference > 1){
+				return false;
+			}
+		}
+		if(difference == 1){
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Adds similar words onto the queue
+	 * @param origin word to compare
+	 * @param exclude words to exclude
+	 * @param q where to add
+	 */
+	private static void createConnections(Node origin, ArrayList<Node> q){
+		Iterator<String> i = dict.iterator();
+		ArrayList<String> rem = new ArrayList<String>();
+		String n;
+
+		//create connection
+		while(i.hasNext()){
+			n = i.next();
+			if(similar(origin.getWord(), n)){
+				q.add(new Node(origin, n));
+				rem.add(n);
+			}
+		}
+		
+		//remove from dictionary
+		for(int index = 0; index < rem.size(); index++){
+			dict.remove(rem.get(index));
+		}
+	}
+	
+	private static void createLinksBFS(Node end){
+		Stack<Node> rev = new Stack<Node>();
+		
+		//creates the reverse order of ladder
+		while(end.getParent() != null){
+			rev.push(end);	
+			end = end.getParent();
+		}
+		
+		//flip the order
+		while(!rev.isEmpty()){
+			link.add(rev.pop().getWord());
+		}
+	}
 }
